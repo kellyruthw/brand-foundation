@@ -1,0 +1,70 @@
+// =============================================================================
+// GLOBALS -- TEMPLATE
+// html/body defaults, then one surface class per $bg-* token. Class names MUST
+// match token names (.bg-dark applies $bg-dark) -- a class whose name describes
+// a different color than it applies is a leftover and gets renamed or deleted.
+// Each surface sets its own text + link colors so content on it stays readable.
+// =============================================================================
+
+@use "../abstracts/variables" as variables;
+@use "../abstracts/mixins" as mixins;
+
+html,
+body {
+  background: variables.$bg-primary;
+  color: variables.$color-text-primary;
+  font-family: variables.$ff-body;
+}
+
+// SURFACES --------------------------------------------------------------------
+
+.bg-primary {
+  background-color: variables.$bg-primary;
+  color: variables.$color-text-primary;
+
+  a {
+    color: variables.$color-link;
+  }
+}
+
+.bg-secondary {
+  background-color: variables.$bg-secondary;
+  color: variables.$color-text-primary;
+
+  a {
+    color: variables.$color-link;
+  }
+}
+
+.bg-tertiary {
+  background-color: variables.$bg-tertiary;
+  color: variables.$color-text-primary;
+
+  a {
+    color: variables.$color-link;
+  }
+}
+
+.bg-dark {
+  background-color: variables.$bg-dark;
+  color: variables.$color-text-inverse;
+
+  a {
+    color: variables.$color-text-inverse;
+  }
+}
+
+.bg-accent {
+  background-color: variables.$bg-accent;
+  color: variables.$color-text-inverse; // TODO: check contrast on the real accent
+
+  a {
+    color: variables.$color-text-inverse;
+  }
+}
+
+// Consecutive sections on the same surface share one gap instead of doubling it.
+.bg-primary + .bg-primary,
+.bg-secondary + .bg-secondary {
+  padding-top: 0;
+}

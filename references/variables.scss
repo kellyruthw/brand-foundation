@@ -1,0 +1,186 @@
+// =============================================================================
+// DESIGN TOKENS -- TEMPLATE
+// -----------------------------------------------------------------------------
+// Every KEY here should exist in every project; every VALUE comes from that
+// project's confirmed design (Phase 2). Nothing below is a real brand value.
+//
+// Placeholders are deliberately loud so an unfilled one can't slip through:
+//   - colors are magenta (#ff00ff) -- any magenta on the review page is a gap
+//   - fonts are named "TODO ..."
+//   - numbers that are genuinely per-project carry a `// TODO: from design`
+//
+// Two tiers: a raw palette (named for what it is), then semantic aliases (named
+// for what it does). Components only ever reference the semantic tier.
+// =============================================================================
+
+$todo-color: #ff00ff; // placeholder only -- must not survive Phase 3
+
+// VIEWPORT ANCHORS (fluid type interpolates between these) --------------------
+$min-vw: 550px; // TODO: from design (narrowest artboard)
+$max-vw: 1728px; // TODO: from design (widest artboard)
+$min-vw-base: 550;
+$max-vw-base: 1728;
+
+// FONTS -----------------------------------------------------------------------
+// Named by role, not by typeface, so swapping a font is a one-line change.
+$ff-display: "TODO display font", serif; // headings / display
+$ff-body: "TODO body font", sans-serif; // body copy, UI, labels
+
+// WEIGHTS -- only the ones the design uses; delete the rest --------------------
+$weight-thin: 100;
+$weight-light: 300;
+$weight-regular: 400;
+$weight-medium: 500;
+$weight-bold: 700;
+
+// LINE-HEIGHTS / LETTER-SPACING -- named by value ---------------------------
+$lh-100: 1;
+$lh-120: 1.2;
+$lh-150: 1.5;
+
+$ls-none: 0;
+$ls-wide: 0.1em; // labels / caps
+
+// SIZE TOKENS (min/max px for fluid type) -----------------------------------
+// TODO: from design. Every token a mixin references MUST exist here.
+// For a fixed-scale app (no fluid type), set min == max.
+$sizes: (
+  display-3xl: (min: 64, max: 140),
+  display-2xl: (min: 56, max: 112),
+  display-xl: (min: 40, max: 80),
+  display-lg: (min: 32, max: 64),
+  display-md: (min: 28, max: 48),
+
+  lead: (min: 22, max: 30),
+  body-lg: (min: 18, max: 22),
+  body: (min: 16, max: 18),
+  body-sm: (min: 14, max: 16),
+  body-xs: (min: 12, max: 14),
+
+  sub-heading: (min: 20, max: 24),
+  label: (min: 12, max: 14),
+);
+
+// Which size token each structural role uses.
+$roles: (
+  h1: display-2xl,
+  h2: display-xl,
+  h3: display-lg,
+  h4: display-md,
+);
+
+// GRID ------------------------------------------------------------------------
+$grid-columns: 12;
+$grid-max-width: $max-vw;
+$grid-container-padding: 0; // TODO: from design
+$grid-container-padding-mobile: 32px; // TODO: from design
+$grid-gutter: 40px; // TODO: from design
+
+// SPACING ---------------------------------------------------------------------
+// ASK the designer the base unit (commonly 4, sometimes 5). Every gap/pad/offset
+// goes through space() in mixins.scss, so anything off this grid is drift.
+$space-base: 4; // TODO: confirm with design
+
+// Section padding per breakpoint -- if two tiers are equal, one should alias the other.
+$padding-section-desktop: 180px; // TODO: from design
+$padding-section-laptop: 150px; // TODO: from design
+$padding-section-tablet: 100px; // TODO: from design
+$padding-section-mobile: 60px; // TODO: from design
+
+// COLORS: RAW PALETTE -------------------------------------------------------
+// Named by hue family + step. Add/remove steps to match the design; don't invent
+// steps the design doesn't use. Near-duplicates get merged during the audit.
+$color-white: #ffffff;
+
+$color-neutral-900: $todo-color; // darkest text/surface
+$color-neutral-700: $todo-color;
+$color-neutral-500: $todo-color;
+$color-neutral-200: $todo-color; // borders / hairlines
+$color-neutral-100: $todo-color; // soft surfaces
+
+$color-primary-900: $todo-color;
+$color-primary-500: $todo-color;
+$color-primary-100: $todo-color;
+
+$color-secondary-500: $todo-color;
+$color-secondary-100: $todo-color;
+
+$color-accent-500: $todo-color;
+$color-accent-100: $todo-color;
+
+// Gradient stops -- one start/end pair per gradient the design uses.
+$gradient-primary-start: $todo-color;
+$gradient-primary-end: $todo-color;
+$gradient-secondary-start: $todo-color;
+$gradient-secondary-end: $todo-color;
+
+// COLORS: SEMANTIC ALIASES ----------------------------------------------------
+// What components reference. Point each at the raw palette.
+
+// Surfaces -- each gets a matching .bg-* class in globals.scss.
+$bg-primary: $color-white;
+$bg-secondary: $color-neutral-100;
+$bg-tertiary: $color-primary-100;
+$bg-dark: $color-neutral-900;
+$bg-accent: $color-accent-500;
+$bg-overlay: rgba($color-neutral-900, 0.85);
+
+// Text
+$color-text-primary: $color-neutral-900;
+$color-text-secondary: $color-neutral-700;
+$color-text-inverse: $color-white;
+$color-link: $color-primary-500;
+
+// Borders
+$color-border: $color-neutral-200;
+$color-border-strong: $color-neutral-500;
+
+$color-focus: $color-primary-500;
+
+// Status tones -- named by what they MEAN, never "positive/negative" or by hue.
+// Which hue means what is the designer's call. Each tone is a trio:
+// accent (border/icon), soft (fill), strong (text on the soft fill, >= 4.5:1).
+$tone-success: $todo-color;
+$tone-success-soft: $todo-color;
+$tone-success-strong: $todo-color;
+$tone-warn: $todo-color;
+$tone-warn-soft: $todo-color;
+$tone-warn-strong: $todo-color;
+$tone-error: $todo-color;
+$tone-error-soft: $todo-color;
+$tone-error-strong: $todo-color;
+$tone-info: $todo-color;
+$tone-info-soft: $todo-color;
+$tone-info-strong: $todo-color;
+
+// SHADOWS -- an intensity scale, all from ONE tint ----------------------------
+$shadow-color: $color-neutral-900; // TODO: confirm with design
+$shadow-sm: 0 1px 2px 0 rgba($shadow-color, 0.05); // resting surfaces: cards
+$shadow-md: 0 2px 6px 0 rgba($shadow-color, 0.08); // floating: popovers, tooltips, menus
+$shadow-lg: 0 8px 24px 0 rgba($shadow-color, 0.12); // overlays: dialogs, drawers
+
+// RADII -- scale with the element -------------------------------------------
+// Small things get small corners. A nested box's radius = its parent's radius
+// minus the padding between them. Components use the ROLE names only.
+$radius-xs: 2px; // TODO: from design -- tiny marks: checkboxes, dots
+$radius-sm: 4px; // TODO: from design -- controls: buttons, inputs, tooltips
+$radius-md: 8px; // TODO: from design -- cards, panels, sections
+$radius-pill: 999px;
+
+$radius-checkbox: $radius-xs;
+$radius-control: $radius-sm;
+$radius-card: $radius-md;
+
+// BREAKPOINTS (desktop-first max-widths) -- a map, so respond() can reject typos
+$breakpoints: (
+  mobile: 500px,
+  portrait: 768px,
+  tablet: 1024px,
+  small-laptop: 1280px,
+  laptop: 1440px,
+  desktop: 1728px,
+); // TODO: from design -- keep only the tiers the build needs
+
+// HEADER --------------------------------------------------------------------
+$header-height-mobile: 72px; // TODO: from design
+$header-height-desktop: 96px; // TODO: from design

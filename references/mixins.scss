@@ -1,0 +1,237 @@
+// =============================================================================
+// MIXINS -- TEMPLATE
+// Every mixin reads from variables.scss; none contain a raw hex or px value
+// except structural constants (100%, 0). Typography mixins are the semantic
+// layer components call -- rename/add/remove to match the design's type styles,
+// but every size-token() they reference must exist in $sizes.
+// =============================================================================
+
+@use "sass:map";
+@use "sass:math";
+@use "./variables" as variables;
+
+// HELPERS -------------------------------------------------------------------
+
+@function _strip-unit($v) {
+  @return math.div($v, ($v * 0 + 1));
+}
+
+/// space(4) = 4 x $space-base. Every gap/pad/offset goes through this.
+@function space($n) {
+  @return $n * variables.$space-base * 1px;
+}
+
+// RESPONSIVE ------------------------------------------------------------------
+
+/// Desktop-first. An unknown name fails the build instead of silently emitting
+/// `@media (max-width: null)`.
+@mixin respond($breakpoint) {
+  @if not map.has-key(variables.$breakpoints, $breakpoint) {
+    @error "respond(): unknown breakpoint `#{$breakpoint}`. Known: #{map.keys(variables.$breakpoints)}.";
+  }
+
+  @media (max-width: map.get(variables.$breakpoints, $breakpoint)) {
+    @content;
+  }
+}
+
+// MOTION ----------------------------------------------------------------------
+// Wrap every transition/animation in motion-safe, so the static state is the
+// default and people who turn motion off get instant changes.
+
+@mixin motion-safe {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+// TYPE PRIMITIVES -------------------------------------------------------------
+
+/// clamp(min, fluid, max) between the viewport anchors.
+@mixin fluid-type($min-size, $max-size, $min-viewport: variables.$min-vw-base, $max-viewport: variables.$max-vw-base) {
+  $min-px: _strip-unit($min-size);
+  $max-px: _strip-unit($max-size);
+  $min-vw: _strip-unit($min-viewport);
+  $max-vw: _strip-unit($max-viewport);
+
+  @if $min-px == $max-px {
+    font-size: #{$min-px}px;
+  } @else {
+    $slope: math.div(($max-px - $min-px), ($max-vw - $min-vw)) * 100;
+    $intercept: $min-px - (math.div($slope * $min-vw, 100));
+
+    font-size: clamp(#{$min-px}px, calc(#{$slope}vw + #{$intercept}px), #{$max-px}px);
+  }
+}
+
+/// Apply a named $sizes entry. Unknown names fail the build.
+@mixin size-token($token) {
+  @if not map.has-key(variables.$sizes, $token) {
+    @error "size-token(): unknown size `#{$token}`. Known: #{map.keys(variables.$sizes)}.";
+  }
+
+  $size-map: map.get(variables.$sizes, $token);
+
+  @include fluid-type(map.get($size-map, min), map.get($size-map, max));
+}
+
+/// Apply the size token a structural role (h1, h2...) maps to.
+@mixin size-role($role) {
+  @if not map.has-key(variables.$roles, $role) {
+    @error "size-role(): unknown role `#{$role}`. Known: #{map.keys(variables.$roles)}.";
+  }
+
+  @include size-token(map.get(variables.$roles, $role));
+}
+
+@mixin type-style($family, $weight, $lh, $ls: variables.$ls-none, $uppercase: false) {
+  font-family: $family;
+  font-weight: $weight;
+  line-height: $lh;
+  letter-spacing: $ls;
+
+  @if $uppercase {
+    text-transform: uppercase;
+  }
+}
+
+// TYPE STYLES -- the semantic layer components call ---------------------------
+// One mixin per type style in the design. Pick family/weight/line-height from
+// the confirmed audit; these are placeholders showing the shape.
+
+@mixin display-3xl {
+  @include size-token(display-3xl);
+  @include type-style(variables.$ff-display, variables.$weight-regular, variables.$lh-100);
+}
+
+@mixin display-2xl {
+  @include size-token(display-2xl);
+  @include type-style(variables.$ff-display, variables.$weight-regular, variables.$lh-100);
+}
+
+@mixin display-xl {
+  @include size-token(display-xl);
+  @include type-style(variables.$ff-display, variables.$weight-regular, variables.$lh-100);
+}
+
+@mixin display-lg {
+  @include size-token(display-lg);
+  @include type-style(variables.$ff-display, variables.$weight-medium, variables.$lh-120);
+}
+
+@mixin display-md {
+  @include size-token(display-md);
+  @include type-style(variables.$ff-display, variables.$weight-medium, variables.$lh-120);
+}
+
+@mixin lead {
+  @include size-token(lead);
+  @include type-style(variables.$ff-body, variables.$weight-regular, variables.$lh-150);
+}
+
+@mixin body-lg {
+  @include size-token(body-lg);
+  @include type-style(variables.$ff-body, variables.$weight-regular, variables.$lh-150);
+}
+
+@mixin body {
+  @include size-token(body);
+  @include type-style(variables.$ff-body, variables.$weight-regular, variables.$lh-150);
+}
+
+@mixin body-sm {
+  @include size-token(body-sm);
+  @include type-style(variables.$ff-body, variables.$weight-regular, variables.$lh-150);
+}
+
+@mixin body-xs {
+  @include size-token(body-xs);
+  @include type-style(variables.$ff-body, variables.$weight-regular, variables.$lh-150);
+}
+
+@mixin sub-heading {
+  @include size-token(sub-heading);
+  @include type-style(variables.$ff-display, variables.$weight-regular, variables.$lh-120);
+}
+
+// Labels, table headings, eyebrow text
+@mixin label {
+  @include size-token(label);
+  @include type-style(variables.$ff-body, variables.$weight-medium, variables.$lh-100, variables.$ls-wide, true);
+}
+
+@mixin button {
+  @include size-token(label);
+  @include type-style(variables.$ff-body, variables.$weight-bold, variables.$lh-100, variables.$ls-wide, true);
+
+  padding: space(4) space(6);
+  border-radius: variables.$radius-control;
+  text-decoration: none;
+}
+
+// LAYOUT / GRID ---------------------------------------------------------------
+
+@mixin container {
+  max-width: variables.$grid-max-width;
+  margin: 0 auto;
+  padding-left: variables.$grid-container-padding;
+  padding-right: variables.$grid-container-padding;
+
+  @include respond(mobile) {
+    padding-left: variables.$grid-container-padding-mobile;
+    padding-right: variables.$grid-container-padding-mobile;
+  }
+}
+
+@mixin grid-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: math.div(variables.$grid-gutter, -2);
+  margin-right: math.div(variables.$grid-gutter, -2);
+}
+
+@mixin grid-col($span) {
+  $ratio: math.div($span, variables.$grid-columns);
+
+  flex: 0 0 math.percentage($ratio);
+  max-width: math.percentage($ratio);
+  padding-left: math.div(variables.$grid-gutter, 2);
+  padding-right: math.div(variables.$grid-gutter, 2);
+}
+
+/// Section padding stepping down per breakpoint.
+@mixin section-padding {
+  padding-top: variables.$padding-section-desktop;
+  padding-bottom: variables.$padding-section-desktop;
+
+  @include respond(laptop) {
+    padding-top: variables.$padding-section-laptop;
+    padding-bottom: variables.$padding-section-laptop;
+  }
+
+  @include respond(tablet) {
+    padding-top: variables.$padding-section-tablet;
+    padding-bottom: variables.$padding-section-tablet;
+  }
+
+  @include respond(portrait) {
+    padding-top: variables.$padding-section-mobile;
+    padding-bottom: variables.$padding-section-mobile;
+  }
+}
+
+// GRADIENTS -- one mixin per gradient in the design ---------------------------
+
+@mixin gradient-primary($angle: 45deg) {
+  background: linear-gradient($angle, variables.$gradient-primary-start, variables.$gradient-primary-end);
+}
+
+@mixin gradient-secondary($angle: 45deg) {
+  background: linear-gradient($angle, variables.$gradient-secondary-start, variables.$gradient-secondary-end);
+}
