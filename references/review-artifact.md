@@ -1,9 +1,16 @@
 # Review artifact
 
 After the foundation is built, generate one self-contained HTML file
-(`foundation-review.html`) so Kelly can check everything at a glance. Compile
-the Sass first so the page uses the real output, not a hand-typed copy.
-Anything that "sticks out" here would have stuck out across the whole site.
+(`foundation-review.html`) so Kelly can check everything at a glance. Anything
+that "sticks out" here would have stuck out across the whole site.
+
+Use the real values, never a hand-typed copy. Sass variables produce no CSS
+on their own, so pull them out with a small Sass file: use `sass:meta`'s
+`module-variables()` on the variables module, output each one as a CSS
+custom property, compile it, and build the page from that. Render the type
+styles by actually applying each mixin to a sample class in the same compile.
+Publish the page as an artifact when the session can; otherwise save it
+outside the project's source folders and give Kelly the path.
 
 ## Sections, in order
 
@@ -23,7 +30,8 @@ Anything that "sticks out" here would have stuck out across the whole site.
 4. **Spacing** — one horizontal bar per spacing/padding/gap variable, drawn to
    scale, labeled with name and value. Uneven steps show up immediately.
 
-5. **Breakpoints** — a labeled ruler, plus the header height at each.
+5. **Breakpoints** — a labeled ruler, with each header-height token marked at
+   the breakpoint where it applies.
 
 6. **Gradients** — one block per gradient mixin.
 

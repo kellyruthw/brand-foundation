@@ -16,24 +16,27 @@
 $todo-color: #ff00ff; // placeholder only -- must not survive Phase 3
 
 // VIEWPORT ANCHORS (fluid type interpolates between these) --------------------
-$min-vw: 550px; // TODO: from design (narrowest artboard)
-$max-vw: 1728px; // TODO: from design (widest artboard)
-$min-vw-base: 550;
-$max-vw-base: 1728;
+// Unitless, because the fluid-type math needs plain numbers; $max-vw is the
+// same value with a unit, derived rather than retyped.
+$min-vw-base: 550; // TODO: from design (narrowest artboard)
+$max-vw-base: 1728; // TODO: from design (widest artboard)
+$max-vw: $max-vw-base * 1px;
 
 // FONTS -----------------------------------------------------------------------
 // Named by role, not by typeface, so swapping a font is a one-line change.
 $ff-display: "TODO display font", serif; // headings / display
 $ff-body: "TODO body font", sans-serif; // body copy, UI, labels
 
-// WEIGHTS -- only the ones the design uses; delete the rest --------------------
+// WEIGHTS -- TODO: from design. Keep only the weights the design uses and
+// the font actually ships; delete the rest (and fix any mixin that used one).
 $weight-thin: 100;
 $weight-light: 300;
 $weight-regular: 400;
 $weight-medium: 500;
 $weight-bold: 700;
 
-// LINE-HEIGHTS / LETTER-SPACING -- named by value ---------------------------
+// LINE-HEIGHTS / LETTER-SPACING -- TODO: from design. Named by value, so
+// add/replace steps to match what the design uses (e.g. $lh-130: 1.3).
 $lh-100: 1;
 $lh-120: 1.2;
 $lh-150: 1.5;
@@ -61,7 +64,7 @@ $sizes: (
   label: (min: 12, max: 14),
 );
 
-// Which size token each structural role uses.
+// Which size token each structural role uses. TODO: from design.
 $roles: (
   h1: display-2xl,
   h2: display-xl,
@@ -70,7 +73,7 @@ $roles: (
 );
 
 // GRID ------------------------------------------------------------------------
-$grid-columns: 12;
+$grid-columns: 12; // TODO: from design
 $grid-max-width: $max-vw;
 $grid-container-padding: 0; // TODO: from design
 $grid-container-padding-mobile: 32px; // TODO: from design
@@ -123,7 +126,9 @@ $bg-secondary: $color-neutral-100;
 $bg-tertiary: $color-primary-100;
 $bg-dark: $color-neutral-900;
 $bg-accent: $color-accent-500;
-$bg-overlay: rgba($color-neutral-900, 0.85);
+
+// Overlays -- not surfaces content sits on, so no .bg-* class.
+$overlay-scrim: rgba($color-neutral-900, 0.85); // TODO: from design -- behind modals/drawers
 
 // Text
 $color-text-primary: $color-neutral-900;
@@ -154,7 +159,8 @@ $tone-info-soft: $todo-color;
 $tone-info-strong: $todo-color;
 
 // SHADOWS -- an intensity scale, all from ONE tint ----------------------------
-$shadow-color: $color-neutral-900; // TODO: confirm with design
+// TODO: from design -- the tint AND each level's offset/blur/opacity.
+$shadow-color: $color-neutral-900;
 $shadow-sm: 0 1px 2px 0 rgba($shadow-color, 0.05); // resting surfaces: cards
 $shadow-md: 0 2px 6px 0 rgba($shadow-color, 0.08); // floating: popovers, tooltips, menus
 $shadow-lg: 0 8px 24px 0 rgba($shadow-color, 0.12); // overlays: dialogs, drawers
@@ -179,7 +185,9 @@ $breakpoints: (
   small-laptop: 1280px,
   laptop: 1440px,
   desktop: 1728px,
-); // TODO: from design -- keep only the tiers the build needs
+); // TODO: from design -- keep only the tiers the build needs. container and
+// section-padding in mixins.scss name mobile/portrait/tablet/laptop; update
+// them if you rename or drop a tier (respond() fails the build on a stale name).
 
 // HEADER --------------------------------------------------------------------
 $header-height-mobile: 72px; // TODO: from design

@@ -14,7 +14,7 @@ This skill makes the agent do what a careful design engineer does:
 2. **Confirm with the designer**: never resolve an inconsistency by silently picking one value.
 3. **Encode the truth once**: variables, mixins and surface classes, then a one-page visual review before any component exists.
 4. **Build component by component, reuse first**: before creating anything, check whether it already exists or can be extended. Silent one-offs are the failure mode.
-5. **Sweep for drift**: a consistency pass that finds hardcoded values, sibling components, dead code and contrast failures, and reports each one by file and line.
+5. **Sweep for drift**: a consistency pass that finds hardcoded values, sibling components, dead code and contrast failures, and reports each one by file and line, with a visual HTML page where each issue is rendered: near-duplicate colors as swatches side by side, off-grid spacing as bars, contrast failures as the real text on its real background.
 
 ## What's in it
 
@@ -27,7 +27,8 @@ brand-foundation/
     ├── mixins.scss               Fluid type, type styles, spacing, breakpoints, motion, grid
     ├── globals.scss              Base styles and one surface class per background token
     ├── main.scss                 Entry-file order
-    └── review-artifact.md        Layout for the at-a-glance visual review page
+    ├── review-artifact.md        Layout for the visual review page of the foundation
+    └── findings-report.md        Layout for the visual page of consistency-pass findings
 ```
 
 The templates hold **keys, not values**. Every project gets the same structure, but its colors, fonts, sizes and spacing come from its own design. Placeholders are deliberately loud (colors are magenta `#ff00ff`, fonts are named "TODO …"), so a value nobody filled in is obvious on the review page. Lookups fail the build on a typo instead of silently outputting nothing.
@@ -72,7 +73,7 @@ Then either:
 - **Let it trigger:** ask Claude to start a build from a Figma file, set up design tokens, audit a design, or build a component. The skill loads when the request matches.
 - **Call it directly:** type `/brand-foundation` at the start of a message.
 
-On an existing project it skips ahead: it runs the consistency pass first, then fills whatever the foundation is missing.
+It works on new and already-built projects. On a new one it starts with the design audit. On a built one it starts with the consistency pass, keeps the project's own token names, and adds only what the foundation is actually missing.
 
 ## About
 

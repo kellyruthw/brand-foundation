@@ -1,6 +1,6 @@
 ---
 name: brand-foundation
-description: Kelly's process for turning a client's Figma file (or any brand design system) into a coded foundation and building a site on top of it without drift. Use this whenever starting a new site or app build from a Figma file, setting up variables/tokens/mixins for a project, auditing a design for color/type/spacing inconsistencies, or building components against an existing design system. Also use it mid-build whenever a new component is about to be created, a color or size value is about to be hardcoded, or something looks like a one-off — the reuse and drift checks in this skill apply at every step, not just setup.
+description: Kelly's process for turning a client's Figma file (or any brand design system) into a coded foundation and building a site on top of it without drift. Use this whenever starting a new site or app build from a Figma file, setting up variables/tokens/mixins for a project, auditing a design for color/type/spacing inconsistencies, running a consistency or drift pass on a site that's already built, or building components against an existing design system. Also use it mid-build whenever a new component is about to be created, a color or size value is about to be hardcoded, or something looks like a one-off — the reuse and drift checks in this skill apply at every step, not just setup.
 ---
 
 # Brand Foundation
@@ -19,17 +19,51 @@ and the reuse rules are how it stays there.
 
 ## Before you start
 
-**Check whether a foundation already exists.** Look for a variables/tokens
-file, mixins, and components that use them. If the project is already built,
-don't start at Phase 1. Run the Phase 5 consistency pass first to see how far
-the build has drifted. Then add whatever the foundation is missing, using the
-Phase 3 checklist (status tones, shadows, radii, spacing function, motion).
-Retrofitting in place beats rebuilding a foundation under a finished site.
+**Check whether the project is new or already built.** Look for a
+variables/tokens file, mixins, and components that use them.
 
-**Ask the spacing base unit.** Every spacing value should be a multiple of one
-base. That's often 4px, but some designers use 5px, and it's the designer's
-call, not yours. Ask once per project. Encode it as `$space-base` with a
-`space($n)` function, and treat any value off that grid as drift.
+- **New project:** work through the five phases in order, starting at Phase 1.
+- **Already built:** don't start at Phase 1, and don't rebuild. Retrofitting in
+  place beats rebuilding a foundation under a finished site.
+  1. Run the Phase 5 consistency pass first to see how far the build has
+     drifted, and report it in the usual three groups.
+  2. Compare the existing foundation against the Phase 3 checklist and every
+     file in `references/`. **Keep the project's own names.** The template keys
+     describe what a foundation needs, not what it must be called: if the
+     project calls its surface token `$bg-tile`, that *is* its `$bg-secondary`.
+     - **Judge by the job, not the shape.** Something counts as present if the
+       project already does that job, even in its own form: a `space()` that
+       hardcodes its 4px base, a `$sizes` map of plain numbers because the app
+       isn't fluid, a `--bg-field` custom property instead of `.bg-*` classes.
+       "Missing" means nothing does the job at all. A tidier shape (pulling
+       the hardcoded base out into `$space-base`) can be offered as a safe fix,
+       but it isn't a gap.
+     - **Add only what's genuinely missing:** often status tones, a shadow
+       scale, a radius scale, or motion helpers. Put each addition where the
+       project keeps that kind of thing (its own functions, variables or
+       mixins file), not where the templates would put it.
+     - **The naming rules apply to new tokens.** Existing names that break a
+       rule, like "positive/negative" tones, stay until Kelly decides. Don't
+       add a correctly named twin beside them (`$tone-error` holding the same
+       value as `$tone-negative`), because that just creates the duplicate
+       Phase 5 flags. Propose the rename as a "needs a decision" item instead.
+       A rename is never a cleanup you do on your own.
+  3. Ask whether there's a Figma file (don't assume either way). If there is,
+     audit it against the code (Phase 1) to catch values that drifted from the
+     design. If there isn't, the shipped code is the record of the design:
+     audit the code, and send ambiguous values to Kelly as questions rather
+     than guessing which one was intended.
+  4. If the foundation changed in step 2, generate the Phase 3 review page for
+     the foundation as it now stands, so Kelly sees the whole system at once.
+  5. From then on, every new component follows Phase 4's reuse check.
+
+**Settle the spacing base unit.** Every spacing value should be a multiple of
+one base. That's often 4px, but some designers use 5px, and it's the
+designer's call, not yours. Ask Kelly; she'll answer or pass it to the
+designer. On a new project, it goes on the Phase 1 question list. On a built
+project that already encodes a base, confirm what's there ("the code uses 4px;
+still right?") rather than asking from scratch. Encode it as `$space-base`
+with a `space($n)` function, and treat any value off that grid as drift.
 
 **Don't carry one project's decisions into another.** Rules Kelly sets for a
 specific site stay with that site. For example, heartcore-books has "no black
@@ -39,14 +73,17 @@ the values from each project's design, and ask when they aren't clear.
 
 ## The five phases
 
-Work through these in order. Do not start Phase 4 until Phase 3 has been
-reviewed by Kelly.
+On a new project, work through these in order, and don't start Phase 4 until
+Kelly has reviewed Phase 3. On an already-built project, follow the order in
+"Before you start" instead.
 
 ### Phase 1 — Audit the design
 
 Before writing any code, read the Figma file (or exported screens, or brand
 guidelines) the way a design engineer would: artboard by artboard, then as a
-whole. Read `references/audit-checklist.md` and produce an audit report using
+whole. If the file defines Figma variables or styles, pull those first
+(with the Figma tools, when they're available). They're the designer's own
+statement of the tokens, so audit the artboards *against* them. Read `references/audit-checklist.md` and produce an audit report using
 the format there.
 
 The point of the audit is not to list everything. It is to find:
@@ -76,16 +113,39 @@ mark the token with a `// TODO: confirm with design` comment, and move on.
 
 ### Phase 3 — Build the foundation
 
-Read `references/variables.scss` and `references/mixins.scss` first. They are
-the starting point for every project and show the shape a foundation should
-take. Every key in them should exist in every project, but none of the values
+Copy the templates into the project. They are the starting point for every
+new project and show the shape a foundation should take:
+
+- `references/variables.scss` → `styles/abstracts/_variables.scss`
+- `references/mixins.scss` → `styles/abstracts/_mixins.scss`
+- `references/globals.scss` → `styles/base/_globals.scss`
+- `references/main.scss` → `styles/main.scss`. It also expects a fonts
+  partial and a CSS reset; create those for the project, since there are no
+  templates for them.
+
+If components use CSS/SCSS modules, set the bundler to prepend the abstracts
+to every module (in Vite, `css.preprocessorOptions.scss.additionalData`).
+Then every module gets the tokens and mixins without importing them, and the
+Phase 5 comparison can compile modules the same way. Every key in them should exist in every new project (an already-built
+project keeps its own names; see "Before you start"), but none of the values
 are real: brand colors, font names, font sizes, spacing and radii all come
 from the project's confirmed values in Phase 2. The placeholders are
 deliberately loud: colors are magenta `#ff00ff`, fonts are named "TODO …", and
-per-project numbers carry `// TODO: from design`. Any magenta or TODO still
-left when Phase 3 ends is an unfilled key, so ask about it rather than
-inventing a value. Add or remove keys (an extra weight, a fourth accent) to
-match the design, but keep the structure.
+per-project numbers carry `// TODO: from design`. Add or remove keys (an extra
+weight, a fourth accent) to match the design, but keep the structure. If you
+rename or remove a breakpoint tier, update the layout mixins that name it;
+`respond()` fails the build on an unknown tier, so you'll find out right away.
+
+The two kinds of TODO have different lifetimes:
+
+- **Magenta and `// TODO: from design`** mean a value nobody has looked at yet.
+  Resolve every one before the review page. Fill it from the design, or, if
+  the design can't answer yet, use the most common value and turn it into
+  `// TODO: confirm with design`. When a value is filled, delete its comment.
+  When nothing references `$todo-color` any more, delete it too.
+- **`// TODO: confirm with design`** means a value that was chosen deliberately
+  but is still waiting on the designer. It can stay past Phase 3. The review
+  page lists it, and Phase 5 sweeps for it until it's answered.
 
 Build in this order, because each layer depends on the one before it:
 
@@ -140,7 +200,9 @@ Rules for this phase:
 Then **generate the review artifact**: a single self-contained HTML page that
 renders every color swatch (with its variable name and hex), every type style
 at its min and max size, every spacing value as a bar, and every gradient. See
-`references/review-artifact.md` for the layout. Kelly reviews this at a glance
+`references/review-artifact.md` for the layout. Publish it as an artifact when
+the session can; otherwise save it outside the project's source folders and
+give Kelly the path. Kelly reviews this at a glance
 to catch anything that "sticks out" before a single component exists. That
 review is far cheaper than finding the same problem across forty components
 later.
@@ -212,9 +274,20 @@ the tweak takes longer than doing it. Group them by what they need:
 3. **Needs a decision**: design questions, one line each, with your
    recommendation.
 
-**Verify by comparing compiled CSS, not by eyeballing.** Compile every module
-before and after your edits (the way the bundler does, with the abstracts
-prepended) and diff the output. A safe fix should produce identical CSS, and
+**Also build the findings as an HTML page,** so Kelly can see the issues
+rather than read about them. Follow `references/findings-report.md` for the
+layout. Every finding shows its problem visually: two near-duplicate colors as
+swatches side by side, a wrong font size as sample text at both sizes, an
+off-grid gap as bars, a contrast failure as the actual text on its actual
+background with the ratio. Publish it as an artifact when the session can;
+otherwise save it outside the project's source folders and give Kelly the
+path. Keep the short text summary in the chat too, so the conversation still
+records what was found.
+
+**Verify by comparing compiled CSS, not by eyeballing.** Compile every
+stylesheet before and after your edits, the same way the project's bundler
+does (for example, with the abstracts prepended to each SCSS module), and diff
+the output. A safe fix should produce identical CSS, and
 a visual change should show exactly the lines you meant to change. This proves
 the change without a full production build, which can starve Kelly's running
 dev server.
@@ -243,4 +316,6 @@ dev server.
 - `references/globals.scss` and `references/main.scss` — how globals sit on
   top (one `.bg-*` surface class per `$bg-*` token, names matching) and how the
   entry file is organized
-- `references/review-artifact.md` — layout for the at-a-glance HTML review page
+- `references/review-artifact.md` — layout for the Phase 3 foundation review
+  page
+- `references/findings-report.md` — layout for the Phase 5 findings page
